@@ -1,1 +1,1 @@
-# TeamMarkovChain
+AfterParty is a platform integrating Bose speakers and phones to democratize song queue requests, automate volume of speakers in rooms depending on number of users inside the room, and assist navigation through the rooms of a building.
