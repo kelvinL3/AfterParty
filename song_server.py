@@ -10,7 +10,7 @@
 
 # IP address of speaker  182.168.1.246 8090
 
-
+num_speakers = 2
 
 class User():
     def __init__(self, user_id):
@@ -34,9 +34,10 @@ class User():
         return False
 
 class Song():
-    def __init__(self, song_name, spotify_uri):
+    def __init__(self, song_name, spotify_uri, author_name):
         self.song_name = song_name
         self.spotify_uri = spotify_uri
+        self.author_name = author_name
         self.num_upvote = 0
         self.num_downvote = 0
     def change_num_upvote(self, number):
@@ -84,18 +85,14 @@ class Playlist():
             for song in playlist.song_list:
                 if song is song_ptr:
                     song.change_num_downvote(-1)
-    # def send_next_song(self): # used in requests
-    #     if len(self.song_list)==0:
-    #         return None
-    #     retval = self.song_list[0]
-    #     d_song = self.song_list.pop(0)
-    #     # for user in 
-    #     return retval
     def preview(self, num):
         ans = self.song_list[:num]
         song_names = [song.song_name for song in ans]
         spotify_uris = [song.spotify_uri for song in ans]
-        return song_names, spotify_uris
+        author_name = [song.author_name for song in ans]
+        ans1 = []
+        ans1.extend((song_names, spotify_uris, author_name))
+        return ans1
 
 class Speaker():
     def __init__(self):
@@ -115,10 +112,16 @@ class Speaker():
             user.remove_upvote(d_song)
             user.remove_downvote(d_song)
         return retval
+
 # playlist = Playlist()
 
-speakers = [Speaker() for i in range(2)]
-# speaker = Speaker()
+speakers = [Speaker() for i in range(num_speakers)]
+# hard-coded songs to start off
+speakers[0].playlist.add_song(Song("Humble", "spotify:track:7KXjTSCq5nL1LoYtL7XAwS", "Room Suggestion"))
+speakers[0].playlist.add_song(Song("SWEET", "spotify:track:2DgMxFMUQRPthW4ROhjen1", "Room Suggestion"))
+speakers[1].playlist.add_song(Song("Hotline Bling", "spotify:track:0wwPcA6wtMf6HUMpIRdeP7", "Room Suggestion"))
+speakers[1].playlist.add_song(Song("Slide", "spotify:track:7tr2za8SQg2CI8EDgrdtNl", "Room Suggestion"))
+
 
 user_commands = ['login','logout','upvote','downvote']
 
@@ -208,7 +211,7 @@ def method():
     elif action==2 or action==3: # upvote & downvote
         # assume user is already here
         user = speakers[s_num].get_user_by_name(user_string)
-        song = Song(song_name, spotify_uri)
+        song = Song(song_name, spotify_uri, user_string)
 
         index = None
         try:   
@@ -262,17 +265,20 @@ def get_next_song(speaker_num):
     song = speakers[speaker_num].send_next_song()
     if song is None:
         return jsonify(song = "", spotify_uri="", error = "No song")
-    return jsonify(song = song.song_name, spotify_uri=song.spotify_uri, error="")
+    return jsonify(song = song.song_name, spotify_uri=song.spotify_uri, name = song.author_name, error="")
     
 @app.route('/speaker/preview/<speaker_num>', methods=['GET'])
 def preview(speaker_num):
     speaker_num = int(speaker_num)
     if speaker_num < 0:
         return jsonify(error="speaker_num is less than 0!")
-    songs,spotify_uris = speakers[speaker_num].playlist.preview(3)
+    retVal = speakers[speaker_num].playlist.preview(3)
+    songs = retVal[0]
+    spotify_uris = retVal[1]
+    author_names = retVal[2]
     if len(songs) == 0:
         return jsonify(songs = [], spotify_uris=[], error = "")
-    return jsonify(songs = songs, spotify_uris = spotify_uris, error="")
+    return jsonify(songs = songs, spotify_uris = spotify_uris, names = author_names, error="")
 
 
 if __name__ == '__main__':
