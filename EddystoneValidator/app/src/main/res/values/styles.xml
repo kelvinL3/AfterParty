@@ -1,0 +1,12 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar">
+            <item name="android:colorPrimary">#EF6F6C</item>
+            <item name="android:colorAccent">#383838</item>
+            <item name="android:colorPrimaryDark">#465775</item>
+
+            <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+</resources>
