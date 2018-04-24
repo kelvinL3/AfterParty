@@ -1,3 +1,8 @@
+# author: Kelvin
+# To run, run this script in cmd
+# use ngrok to set up forwarding
+# postman or chrome to send get / post request
+
 # receive song requests from app
 # link with spotify
 # when aaron's server request something from me, give a song to play
@@ -117,10 +122,10 @@ class Speaker():
 
 speakers = [Speaker() for i in range(num_speakers)]
 # hard-coded songs to start off
-speakers[0].playlist.add_song(Song("Humble", "spotify:track:7KXjTSCq5nL1LoYtL7XAwS", "Room Suggestion"))
-speakers[0].playlist.add_song(Song("SWEET", "spotify:track:2DgMxFMUQRPthW4ROhjen1", "Room Suggestion"))
-speakers[1].playlist.add_song(Song("Hotline Bling", "spotify:track:0wwPcA6wtMf6HUMpIRdeP7", "Room Suggestion"))
-speakers[1].playlist.add_song(Song("Slide", "spotify:track:7tr2za8SQg2CI8EDgrdtNl", "Room Suggestion"))
+# speakers[0].playlist.add_song(Song("Humble", "spotify:track:7KXjTSCq5nL1LoYtL7XAwS", "Room Suggestion"))
+# speakers[0].playlist.add_song(Song("SWEET", "spotify:track:2DgMxFMUQRPthW4ROhjen1", "Room Suggestion"))
+# speakers[1].playlist.add_song(Song("Hotline Bling", "spotify:track:0wwPcA6wtMf6HUMpIRdeP7", "Room Suggestion"))
+# speakers[1].playlist.add_song(Song("Slide", "spotify:track:7tr2za8SQg2CI8EDgrdtNl", "Room Suggestion"))
 
 
 user_commands = ['login','logout','upvote','downvote']
@@ -257,6 +262,14 @@ def method():
                     songsDownvote=temp4,
                     songsUpvote=temp3)
 
+
+default_song_list = [("Cardiac Arrest", "spotify:track:6zQyu8L8yUuJkl6LbQ6iKU", "Hemanth"),
+                    ("Shots", "spotify:track:7odsUFDiJVv0HUQuSYsRbT", "Hemanth"),
+                    ("Midnight City", "spotify:track:1eyzqe2QqGZUmfcPZtrIyt", "Kelvin"),
+                    ("Attention", "spotify:track:4iLqG9SeJSnt0cSPICSjxv", "Aaron"),
+                    ("Death of a Bachelor", "spotify:track:1BECwm5qkaBwlbfo4kpYx8", "Kelvin"),
+                    ("In The Arms Of A Stranger", "spotify:track:48GBbQiTSlXX5i0cn3iIiJ", "Hemanth")]
+
 # speaker methods
 @app.route('/speaker/getnextsong/<speaker_num>', methods=['GET'])
 def get_next_song(speaker_num):
@@ -264,6 +277,10 @@ def get_next_song(speaker_num):
     # song = speakers[speaker_num].playlist.send_next_song()
     song = speakers[speaker_num].send_next_song()
     if song is None:
+        if len(default_song_list) != 0:
+            import random
+            default_song = default_song_list.pop(random.randrange(len(default_song_list)))
+            jsonify(song = default_song[0], spotify_uri=default_song[1], name = default_song[2], error="")
         return jsonify(song = "", spotify_uri="", error = "No song")
     return jsonify(song = song.song_name, spotify_uri=song.spotify_uri, name = song.author_name, error="")
     
